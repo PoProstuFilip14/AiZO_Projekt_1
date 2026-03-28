@@ -1,6 +1,22 @@
 ﻿#include <iostream>
 
-int N = 100;
+int N = 10; template <typename T>
+void insertionSort(T* array, int size, int gap) {
+    for (int gapI = 0; gapI < gap; gapI++) {
+        for (int i = size - 1 - gapI - gap; i >= 0; i -= gap) {
+            for (int j = i; j < size - gapI - 1; j += gap) {
+                if (array[j] > array[j + gap]) {
+                    int helper = array[j];
+                    array[j] = array[j + gap];
+                    array[j + gap] = helper;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+    }
+}
 
 template <typename T>
 void quickSort(T* array, int left, int right) {
@@ -37,6 +53,14 @@ void quickSort(T* array, int left, int right) {
     }
 }
 
+template <typename T>
+void shellSort(T* array, int size) {
+    int gap = size / 2;
+    for (; gap >= 1; gap /= 2) {
+        insertionSort(array, size, gap);
+    }
+}
+
 int main()
 {
     srand(time(0));
@@ -70,7 +94,7 @@ int main()
     }
     std::cout << std::endl;
 
-    quickSort(array, 0, N - 1);
+    shellSort(array, N);
 
     for (int i = 0; i < N; i++) {
         std::cout << array[i] << " ";
