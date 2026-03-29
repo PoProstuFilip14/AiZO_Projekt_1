@@ -125,10 +125,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AiZO_Projekt_1.cpp" />
-    <ClCompile Include="bucket.cpp" />
+    <ClCompile Include="Bucket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bucket.h" />
+    <ClInclude Include="Bucket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,19 @@
 ﻿#include <iostream>
+#include "Bucket.h"
 
-int N = 10; template <typename T>
+int N = 10000;
+
+template <typename T>
+bool testSorting(T* array, int size) {
+    for (int i = 0; i < size - 1; i++) {
+        if (array[i] > array[i + 1]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
 void insertionSort(T* array, int size, int gap) {
     for (int gapI = 0; gapI < gap; gapI++) {
         for (int i = size - 1 - gapI - gap; i >= 0; i -= gap) {
@@ -61,43 +74,106 @@ void shellSort(T* array, int size) {
     }
 }
 
-int main()
-{
+template <typename T>
+void bucketSort(T* array, int size) {
+    Bucket* buckets = new Bucket[size];
+    int minValue = INT_MAX;
+    int maxValue = INT_MIN;
+    for (int i = 0; i < size; i++) {
+        if (array[i] < minValue) {
+            minValue = array[i];
+        }
+        if (array[i] > maxValue) {
+            maxValue = array[i];
+        }
+    }
+    int bucketSize = (maxValue - minValue) / size;
+    if (bucketSize < 1) {
+        bucketSize = 1;
+    }
+    for (int i = 0; i < size; i++) {
+        int min = i * bucketSize + minValue;
+        int max;
+        if (i == size - 1) {
+            max = maxValue + 1;
+        }
+        else {
+            max = min + bucketSize;
+        }
+        int items = 0;
+        int* tempBucket = new int[size];
+        for (int j = 0; j < size; j++) {
+            if (array[j] >= min && array[j] < max) {
+                tempBucket[items] = array[j];
+                items++;
+            }
+        }
+        int* bucketArray = new int[items];
+        //std::cout << std::endl << min << "-" << max << ": ";
+        for (int j = 0; j < items; j++) {
+            bucketArray[j] = tempBucket[j];
+            //std::cout << bucketArray[j] << " ";
+        }
+
+        delete[] tempBucket;
+
+        buckets[i].setBucket(min, max, items, bucketArray);
+        if (buckets[i].getSize() > 1) {
+            insertionSort(buckets[i].getBucketArray(), buckets[i].getSize(), 1);
+        }
+    }
+    //std::cout << std::endl;
+
+    int pos = 0;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < buckets[i].getSize(); j++) {
+            array[pos] = buckets[i].getBucketArray()[j];
+            pos++;
+        }
+
+        delete[] buckets[i].getBucketArray();
+    }
+
+    delete[] buckets;
+}
+
+int main() {
     srand(time(0));
 
     int* array = new int[N];
     int* arrayCopy = new int[N];
+    for (int iteration = 0; iteration < 100; iteration++) {
+        for (int i = 0; i < N; i++) {
+            array[i] = rand();
+            arrayCopy[i] = array[i];
+        }
 
-    for (int i = 0; i < N; i++) {
-        array[i] = rand() % 10;
-        arrayCopy[i] = array[i];
+        quickSort(array, 0, N - 1);
+        if (!testSorting(array, N)) {
+            std::cout << "Error for quick sort\n";
+        }
+
+        for (int i = 0; i < N; i++) {
+            array[i] = arrayCopy[i];
+        }
+
+        shellSort(array, N);
+        if (!testSorting(array, N)) {
+            std::cout << "Error for shell sort\n";
+        }
+
+        for (int i = 0; i < N; i++) {
+            array[i] = arrayCopy[i];
+        }
+
+        bucketSort(array, N);
+        if (!testSorting(array, N)) {
+            std::cout << "Error for bucket sort\n";
+        }
     }
-    
-    for (int i = 0; i < N; i++) {
-        std::cout << array[i] << " ";
-    }
-    std::cout << std::endl;
 
-    quickSort(array, 0, N - 1);
+    delete[] array;
+    delete[] arrayCopy;
 
-    for (int i = 0; i < N; i++) {
-        std::cout << array[i] << " ";
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < N; i++) {
-        array[i] = arrayCopy[i];
-    }
-
-    for (int i = 0; i < N; i++) {
-        std::cout << array[i] << " ";
-    }
-    std::cout << std::endl;
-
-    shellSort(array, N);
-
-    for (int i = 0; i < N; i++) {
-        std::cout << array[i] << " ";
-    }
-    std::cout << std::endl;
+    return 0;
 }
